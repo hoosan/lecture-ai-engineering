@@ -289,3 +289,32 @@ def display_data_page():
     for metric, description in metrics_info.items():
         with st.expander(f"{metric}"):
             st.write(description)
+
+# --- ダッシュボードページのUI ---
+def display_dashboard_page():
+    st.subheader("評価ダッシュボード")
+
+    # 全履歴取得
+    df = get_chat_history()
+    if df.empty:
+        st.info("まだデータがありません。")
+        return
+
+    # 日次の質問件数推移
+    df['date'] = pd.to_datetime(df['timestamp']).dt.date
+    daily_counts = df.groupby('date').size()
+    st.line_chart(daily_counts, height=300, use_container_width=True)
+
+    # 日次の平均応答時間推移
+    daily_time = df.groupby('date')['response_time'].mean()
+    st.line_chart(daily_time, height=300, use_container_width=True)
+
+    # 正確性の時系列（棒グラフで積み上げ可）
+    pivot = df.pivot_table(index='date', columns='is_correct', values='id', aggfunc='count').fillna(0)
+    st.bar_chart(pivot, height=300, use_container_width=True)
+
+    # 指標の相関マトリクス
+    metrics = ['bleu_score','similarity_score','response_time','word_count','relevance_score']
+    corr = df[metrics].corr()
+    st.write("##### 評価指標の相関")
+    st.dataframe(corr)
