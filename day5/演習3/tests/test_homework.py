@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "../models/titanic_model.pkl")
 
+
 @pytest.fixture(scope="module")
 def model():
     """保存済みモデルをロード"""
