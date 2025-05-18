@@ -171,3 +171,21 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+def test_no_missing_after_preprocessing(sample_data, preprocessor):
+    """
+    前処理パイプラインが数値・カテゴリ両方の欠損値を
+    適切に補完しているかを検証するテスト。
+    """
+    # ラベル列を除外
+    X = sample_data.drop("Survived", axis=1)
+
+    # 前処理パイプラインを適用
+    X_transformed = preprocessor.fit_transform(X)
+
+    # One-Hot エンコーダが疎行列を返す場合があるので toarray() で密に
+    if hasattr(X_transformed, "toarray"):
+        X_transformed = X_transformed.toarray()
+
+    # 欠損値が残っていないことを確認
+    assert not np.isnan(X_transformed).any(), "前処理後に NaN が残っています"
