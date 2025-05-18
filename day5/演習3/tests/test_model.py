@@ -172,6 +172,7 @@ def test_model_reproducibility(sample_data, preprocessor):
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
 
+
 def test_no_missing_after_preprocessing(sample_data, preprocessor):
     """
     前処理パイプラインが数値・カテゴリ両方の欠損値を
